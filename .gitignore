@@ -1,7 +1,13 @@
-private/*
-!private/.gitkeep
-!private/form-settings-variables-staging-sample
-!private/common-variables-staging-sample
+config/*
+config/staging/*
+config/production/*
+
+# Allow sample configs - make sure they don't contain sensitive data
+!config/.gitkeep
+!config/staging/.gitkeep
+!config/production/.gitkeep
+!config/staging/common-variables-staging-sample
+!config/staging/form-field-settings-staging-sample
 
 logs/*
 !logs/.gitkeep

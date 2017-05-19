@@ -1,0 +1,13 @@
+#!/bin/bash
+# Project specific common variables: production
+# DO NOT COMMIT
+# ------------------------------------------------------------------------------
+# There should be a user called 
+USERNAME="big-billy"
+IP="12.3333.44.44"
+BASE_SRC="/var/www/html/mysite.dev"
+BASE_DEST="11111"
+PORT=""
+
+# Array of common rsync options
+OPT=(--progress -a -v -rz)

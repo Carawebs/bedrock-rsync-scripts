@@ -14,8 +14,8 @@ fi
 # Set directory and include dependencies for the specified environment.
 THIS=$(readlink -f ${BASH_SOURCE[0]})
 PROJECT_DIR=$(dirname $THIS)
-. "$PROJECT_DIR/private/form-settings-variables-$ENV"
+. "$PROJECT_DIR/config/${ENV}/form-field-settings-${ENV}"
 
 # Execute the sync.
-rsync "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST > ${LOG}
-#echo "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST
+#rsync "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST > ${LOG}
+echo "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST
