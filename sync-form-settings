@@ -1,0 +1,21 @@
+#!/bin/bash
+# Push form-field settings from local dev site to staging.
+#
+# Variables are held in /private/form-settings-variables-$ENV, so they are
+# environment specific.
+# ------------------------------------------------------------------------------
+if [ -z "$1" ]
+then
+    echo "You must specify an environment: \"staging\" or \"production\"."; exit
+else
+    ENV=$1
+fi
+
+# Set directory and include dependencies for the specified environment.
+THIS=$(readlink -f ${BASH_SOURCE[0]})
+PROJECT_DIR=$(dirname $THIS)
+. "$PROJECT_DIR/private/form-settings-variables-$ENV"
+
+# Execute the sync.
+rsync "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST > ${LOG}
+#echo "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST
