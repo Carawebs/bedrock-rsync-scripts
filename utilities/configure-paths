@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# ------------------------------------------------------------------------------
+
+function configure_paths() {
+
+    shopt -s extglob nullglob
+
+    CONFIG_DIR="$1/config"
+    ENVIRONMENT_DIRS=($CONFIG_DIR/*)
+
+    if ((${#ENVIRONMENT_DIRS[@]}<=1)); then
+        printf 'No config directories found. Exiting.\n'
+        exit 0
+    fi
+
+    OPTIONS=()
+    for ((i=0; i < ${#ENVIRONMENT_DIRS[@]}; i++))
+    do
+        OPTIONS+=($(basename ${ENVIRONMENT_DIRS[$i]}))
+    done
+    OPTIONS+=("Exit")
+
+    PS3='Please enter your choice: '
+    select opt in "${OPTIONS[@]}"
+    do
+        if [ "$opt" = "Exit" ]; then
+            echo End
+            exit 0
+        fi
+        if [[ -n $opt ]]; then
+            ENV=$(basename $opt)
+            # Set the local path to the config directory
+            echo "Enter the relative path to the remote config directory for ${ENV}:"
+            read REL_REMOTE_PATH
+
+            echo -e "\n${UNIQUE_ID}_${ENV}=\"$REL_REMOTE_PATH\"" >> $CONFIG_DIR/$opt/variables-$ENV
+            break
+        else
+            print 'invalid.'
+        fi
+    done
+}

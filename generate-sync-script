@@ -1,0 +1,69 @@
+#!/bin/bash
+# Generate a sync script
+#
+# Variables are held in /private/form-settings-variables-$ENV, so they are
+# environment specific.
+# ------------------------------------------------------------------------------
+
+# Get a list of possible environments: subdirs under `/config`
+#
+# Select an environment from an options list
+#
+# Set the Project directory and include dependencies for this script.
+# See https://www.cyberciti.biz/faq/bash-loop-over-file/
+# ------------------------------------------------------------------------------
+THIS=$(readlink -f ${BASH_SOURCE[0]})
+CURRENT_PARENT_DIR=$(dirname $THIS)
+for FILENAME in $CURRENT_PARENT_DIR/utilities/*; do
+    if [[ -f ${FILENAME} ]] ; then
+        . "${FILENAME}"
+    fi
+done
+
+# Set the script name (e.g. `sync-form-settings`)
+echo "Enter the new filename:"
+read NEW_FILENAME
+UNIQUE_ID=${NEW_FILENAME//[-]/_}
+
+# Set the local path to the config directory
+echo "Enter the full path to the local config directory:"
+read SRC
+mkdir -p ${CURRENT_PARENT_DIR}/config && touch common
+echo "LOCAL_${UNIQUE_ID}_PATH=\"${SRC}\"" >> ${CURRENT_PARENT_DIR}/config/common
+
+# get environment (remote) base variables
+
+# Prompt user for remote paths
+configure_paths $CURRENT_PARENT_DIR
+
+# Output to file
+read -r -d '' CONTENT << EOF
+#!/bin/bash
+# Project specific common variables: ${ENV}
+# DO NOT COMMIT
+# ------------------------------------------------------------------------------
+if [ -z "\$1" ]
+then
+    echo "You must specify an environment."; exit
+else
+    ENV=\$1
+fi
+
+# Set directory and include dependencies for the specified environment.
+THIS=\$(readlink -f \${BASH_SOURCE[0]})
+SYNC_DIR=\$(dirname \$THIS)
+PROJECT_DIR=\$(dirname \$SYNC_DIR)
+. "\$PROJECT_DIR/config/\${ENV}/variables-\${ENV}"
+. "\$PROJECT_DIR/config/common"
+
+REL="${UNIQUE_ID}_\${ENV}"
+DEST=\${BASE_DEST}/\${!REL}
+SRC=\${LOCAL_${UNIQUE_ID}_PATH}
+# Execute the sync.
+#rsync "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST > \${LOG}
+echo "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
+EOF
+
+mkdir -p ${CURRENT_PARENT_DIR}/sync #&& touch ${NEW_FILENAME}
+# See http://unix.stackexchange.com/a/19708
+sh -c "printf '%s' '$CONTENT' > ${CURRENT_PARENT_DIR}/sync/${NEW_FILENAME}"

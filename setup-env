@@ -14,7 +14,7 @@ fi
 # Set path to the common config file for this environment
 THIS=$(readlink -f ${BASH_SOURCE[0]})
 CURRENT_PARENT_DIR=$(dirname $THIS)
-CONFIG_FILE="$CURRENT_PARENT_DIR/config/${ENV}/common-variables-${ENV}"
+CONFIG_FILE="$CURRENT_PARENT_DIR/config/${ENV}/variables-${ENV}"
 
 # Collect User Input
 echo "Enter the username for the remote ${ENV} server:"
@@ -35,7 +35,6 @@ read -r -d '' CONFIG_CONTENT << EOF
 # Project specific common variables: ${ENV}
 # DO NOT COMMIT
 # ------------------------------------------------------------------------------
-# There should be a user called $SERVERNAMEbackup
 USERNAME="${USERNAME}"
 IP="${IP}"
 BASE_SRC="${LOCAL_BASEPATH}"
@@ -48,4 +47,4 @@ EOF
 
 mkdir -p ${CURRENT_PARENT_DIR}/config/${ENV} && touch ${CONFIG_FILE}
 # See http://unix.stackexchange.com/a/19708
-sudo sh -c "printf '%s' '$CONFIG_CONTENT' > ${CONFIG_FILE}"
+sh -c "printf '%s' '$CONFIG_CONTENT' > ${CONFIG_FILE}"

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Project specific common variables: production
+# DO NOT COMMIT
+# ------------------------------------------------------------------------------
+if [ -z "$1" ]
+then
+    echo "You must specify an environment."; exit
+else
+    ENV=$1
+fi
+
+# Set directory and include dependencies for the specified environment.
+THIS=$(readlink -f ${BASH_SOURCE[0]})
+SYNC_DIR=$(dirname $THIS)
+PROJECT_DIR=$(dirname $SYNC_DIR)
+. "$PROJECT_DIR/config/${ENV}/variables-${ENV}"
+. "$PROJECT_DIR/config/common"
+
+REL="sync_form_fields_${ENV}"
+DEST=${BASE_DEST}/${!REL}
+SRC=${LOCAL_sync_form_fields_PATH}
+# Execute the sync.
+#rsync "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST > ${LOG}
+echo "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST
