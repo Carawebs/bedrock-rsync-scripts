@@ -30,11 +30,14 @@ function configure_paths() {
         fi
         if [[ -n $opt ]]; then
             ENV=$(basename $opt)
+
             # Set the local path to the config directory
             echo "Enter the relative path to the remote config directory for ${ENV}:"
             read REL_REMOTE_PATH
 
+            # Write the user-provided value into the relevant environment variables file
             echo -e "\n${UNIQUE_ID}_${ENV^^}=\"$REL_REMOTE_PATH\"" >> $CONFIG_DIR/$opt/variables-$ENV
+
             break
         else
             print 'invalid.'
