@@ -1,6 +1,8 @@
 config/*
 config/staging/*
 config/production/*
+scripts
+logs
 
 # Allow sample configs - make sure they don't contain sensitive data
 !config/.gitkeep

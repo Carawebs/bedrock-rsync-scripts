@@ -21,8 +21,8 @@ echo "Enter the username for the remote ${ENV} server:"
 read USERNAME
 echo "Enter the IP address of the remote ${ENV} server:"
 read IP
-echo "Enter the base path for your LOCAL project (/var/www/html/site.dev):"
-read LOCAL_BASEPATH
+# echo "Enter the base path for your LOCAL project (/var/www/html/site.dev):"
+# read LOCAL_BASEPATH
 echo "Enter the base path for your REMOTE project on the ${ENV} server:"
 read REMOTE_BASEPATH
 echo "Enter the SSH port used to rsync with the remote ${ENV} server:"

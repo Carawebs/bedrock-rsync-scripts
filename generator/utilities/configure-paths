@@ -34,7 +34,7 @@ function configure_paths() {
             echo "Enter the relative path to the remote config directory for ${ENV}:"
             read REL_REMOTE_PATH
 
-            echo -e "\n${UNIQUE_ID}_${ENV}=\"$REL_REMOTE_PATH\"" >> $CONFIG_DIR/$opt/variables-$ENV
+            echo -e "\n${UNIQUE_ID}_${ENV^^}=\"$REL_REMOTE_PATH\"" >> $CONFIG_DIR/$opt/variables-$ENV
             break
         else
             print 'invalid.'

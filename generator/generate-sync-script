@@ -14,6 +14,8 @@
 # ------------------------------------------------------------------------------
 THIS=$(readlink -f ${BASH_SOURCE[0]})
 CURRENT_PARENT_DIR=$(dirname $THIS)
+PROJECT_ROOT=$(dirname $CURRENT_PARENT_DIR)
+
 for FILENAME in $CURRENT_PARENT_DIR/utilities/*; do
     if [[ -f ${FILENAME} ]] ; then
         . "${FILENAME}"
@@ -24,22 +26,28 @@ done
 echo "Enter the new filename:"
 read NEW_FILENAME
 UNIQUE_ID=${NEW_FILENAME//[-]/_}
+UNIQUE_ID="${UNIQUE_ID^^}"
+
+echo "Enter a comment for the generator:"
+read COMMENT
 
 # Set the local path to the config directory
 echo "Enter the full path to the local config directory:"
 read SRC
-mkdir -p ${CURRENT_PARENT_DIR}/config && touch common
-echo "LOCAL_${UNIQUE_ID}_PATH=\"${SRC}\"" >> ${CURRENT_PARENT_DIR}/config/common
+
+mkdir -p ${PROJECT_ROOT}/config && touch ${PROJECT_ROOT}/config/common
+echo "LOCAL_${UNIQUE_ID}_PATH=\"${SRC}\"" >> ${PROJECT_ROOT}/config/common
 
 # get environment (remote) base variables
 
 # Prompt user for remote paths
-configure_paths $CURRENT_PARENT_DIR
+configure_paths $PROJECT_ROOT
 
 # Output to file
 read -r -d '' CONTENT << EOF
 #!/bin/bash
 # Project specific common variables: ${ENV}
+# ${COMMENT}
 # DO NOT COMMIT
 # ------------------------------------------------------------------------------
 if [ -z "\$1" ]
@@ -56,7 +64,7 @@ PROJECT_DIR=\$(dirname \$SYNC_DIR)
 . "\$PROJECT_DIR/config/\${ENV}/variables-\${ENV}"
 . "\$PROJECT_DIR/config/common"
 
-REL="${UNIQUE_ID}_\${ENV}"
+REL="${UNIQUE_ID}_\${ENV^^}"
 DEST=\${BASE_DEST}/\${!REL}
 SRC=\${LOCAL_${UNIQUE_ID}_PATH}
 # Execute the sync.
@@ -64,6 +72,6 @@ SRC=\${LOCAL_${UNIQUE_ID}_PATH}
 echo "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
 EOF
 
-mkdir -p ${CURRENT_PARENT_DIR}/sync #&& touch ${NEW_FILENAME}
+mkdir -p ${PROJECT_ROOT}/scripts #&& touch ${NEW_FILENAME}
 # See http://unix.stackexchange.com/a/19708
-sh -c "printf '%s' '$CONTENT' > ${CURRENT_PARENT_DIR}/sync/${NEW_FILENAME}"
+sh -c "printf '%s' '$CONTENT' > ${PROJECT_ROOT}/scripts/${NEW_FILENAME}"
