@@ -1,0 +1,36 @@
+#!/bin/bash
+# Sync Bedrock `config` directory from local to remote.
+#
+# Environment specific variables are held in `/config/variables-$ENV`
+# ------------------------------------------------------------------------------
+if [ -z "$1" ]
+then
+    echo "You must specify an environment: \"staging\" or \"production\"."; exit
+else
+    ENV=$1
+fi
+
+# Set directory and include dependencies for the specified environment.
+THIS=$(readlink -f ${BASH_SOURCE[0]})
+PROJECT_DIR=$(dirname $THIS)
+. "$PROJECT_DIR/config/local/variables-local"
+. "$PROJECT_DIR/config/${ENV}/variables-${ENV}"
+
+# Paths for rsync
+SRC="${BASE_SRC}/config"
+DEST="${BASE_DEST}/config"
+LOG="${PROJECT_DIR}/logs/config-log-${ENV}"
+
+function run_rsync() {
+    rsync "${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST > ${LOG}
+}
+
+echo "You're about to run this command:"
+echo "rsync ${OPT[@]}" -e "ssh -p ${PORT}" $SRC/ ${USERNAME}@${IP}:$DEST
+echo ""
+read -p "Continue with rsync(y/n)?" choice
+case "$choice" in
+  y|Y ) run_rsync;;
+  n|N ) exit;;
+  * ) echo "invalid";;
+esac

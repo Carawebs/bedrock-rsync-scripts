@@ -67,11 +67,23 @@ PROJECT_DIR=\$(dirname \$SYNC_DIR)
 REL="${UNIQUE_ID}_\${ENV^^}"
 DEST=\${BASE_DEST}/\${!REL}
 SRC=\${LOCAL_${UNIQUE_ID}_PATH}
+
 # Execute the sync.
-#rsync "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST > \${LOG}
-echo "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
+function run_rsync() {
+    rsync "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST > \${LOG}
+}
+
+echo "You're about to run this command:"
+echo "rsync \${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
+echo "\n"
+read -p "Continue with rsync(y/n)?" choice
+case "\$choice" in
+  y|Y ) run_rsync;;
+  n|N ) exit;;
+  * ) echo "invalid";;
+esac
 EOF
 
-mkdir -p ${PROJECT_ROOT}/scripts #&& touch ${NEW_FILENAME}
+mkdir -p ${PROJECT_ROOT}/scripts
 # See http://unix.stackexchange.com/a/19708
 sh -c "printf '%s' '$CONTENT' > ${PROJECT_ROOT}/scripts/${NEW_FILENAME}"

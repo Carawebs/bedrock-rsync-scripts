@@ -14,7 +14,8 @@ fi
 # Set path to the common config file for this environment
 THIS=$(readlink -f ${BASH_SOURCE[0]})
 CURRENT_PARENT_DIR=$(dirname $THIS)
-CONFIG_FILE="$CURRENT_PARENT_DIR/config/${ENV}/variables-${ENV}"
+PROJECT_ROOT=$(dirname $CURRENT_PARENT_DIR)
+CONFIG_FILE="${PROJECT_ROOT}/config/${ENV}/variables-${ENV}"
 
 # Collect User Input
 echo "Enter the username for the remote ${ENV} server:"
@@ -45,6 +46,5 @@ PORT="${PORT}"
 OPT=(--progress -a -v -rz)
 EOF
 
-mkdir -p ${CURRENT_PARENT_DIR}/config/${ENV} && touch ${CONFIG_FILE}
-# See http://unix.stackexchange.com/a/19708
+mkdir -p ${PROJECT_ROOT}/config/${ENV}
 sh -c "printf '%s' '$CONFIG_CONTENT' > ${CONFIG_FILE}"
