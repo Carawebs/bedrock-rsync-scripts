@@ -6,9 +6,9 @@
 # ------------------------------------------------------------------------------
 if [ -z "$1" ]
 then
-    echo "You must specify an environment: \"staging\" or \"production\"."; exit
+	echo "You must specify an environment: \"staging\" or \"production\"."; exit
 else
-    ENV=$1
+	ENV=$1
 fi
 
 # Set path to the common config file for this environment
@@ -31,19 +31,19 @@ read PORT
 
 #
 # Output to file
-read -r -d '' CONFIG_CONTENT << EOF
-#!/bin/bash
-# Project specific common variables: ${ENV}
-# DO NOT COMMIT
-# ------------------------------------------------------------------------------
-USERNAME="${USERNAME}"
-IP="${IP}"
-BASE_SRC="${LOCAL_BASEPATH}"
-BASE_DEST="${REMOTE_BASEPATH}"
-PORT="${PORT}"
+read -r -d '' CONFIG_CONTENT <<- EOF
+	#!/bin/bash
+	# Project specific common variables: ${ENV}
+	# IMPORTANT: DO NOT COMMIT THIS FILE TO YOUR VCS
+	# ------------------------------------------------------------------------------
+	USERNAME="${USERNAME}"
+	IP="${IP}"
+	BASE_SRC="${LOCAL_BASEPATH}"
+	BASE_DEST="${REMOTE_BASEPATH}"
+	PORT="${PORT}"
 
-# Array of common rsync options
-OPT=(--progress -a -v -rz)
+	# Array of common rsync options
+	OPT=(--progress -a -v -rz)
 EOF
 
 mkdir -p ${PROJECT_ROOT}/config/${ENV}

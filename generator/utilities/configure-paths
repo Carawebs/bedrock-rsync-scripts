@@ -1,8 +1,4 @@
-#!/bin/bash
-#
-# ------------------------------------------------------------------------------
-
-function configure_paths() {
+function configure_paths {
 
     shopt -s extglob nullglob
 
@@ -29,7 +25,8 @@ function configure_paths() {
             exit 0
         fi
         if [[ -n $opt ]]; then
-            ENV=$(basename $opt)
+            # ENV=$(basename $opt)
+            ENV=$opt
 
             # Set the local path to the config directory
             echo "Enter the relative path to the remote config directory for ${ENV}:"

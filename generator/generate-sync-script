@@ -17,9 +17,9 @@ CURRENT_PARENT_DIR=$(dirname $THIS)
 PROJECT_ROOT=$(dirname $CURRENT_PARENT_DIR)
 
 for FILENAME in $CURRENT_PARENT_DIR/utilities/*; do
-    if [[ -f ${FILENAME} ]] ; then
-        . "${FILENAME}"
-    fi
+	if [[ -f ${FILENAME} ]] ; then
+		. "${FILENAME}"
+	fi
 done
 
 # Set the script name (e.g. `sync-form-settings`)
@@ -38,52 +38,50 @@ read SRC
 mkdir -p ${PROJECT_ROOT}/config && touch ${PROJECT_ROOT}/config/common
 echo "LOCAL_${UNIQUE_ID}_PATH=\"${SRC}\"" >> ${PROJECT_ROOT}/config/common
 
-# get environment (remote) base variables
-
 # Prompt user for remote paths
 configure_paths $PROJECT_ROOT
 
-# Output to file
-read -r -d '' CONTENT << EOF
-#!/bin/bash
-# Project specific common variables: ${ENV}
-# ${COMMENT}
-# DO NOT COMMIT
-# ------------------------------------------------------------------------------
-if [ -z "\$1" ]
-then
-    echo "You must specify an environment."; exit
-else
-    ENV=\$1
-fi
-
-# Set directory and include dependencies for the specified environment.
-THIS=\$(readlink -f \${BASH_SOURCE[0]})
-SYNC_DIR=\$(dirname \$THIS)
-PROJECT_DIR=\$(dirname \$SYNC_DIR)
-. "\$PROJECT_DIR/config/\${ENV}/variables-\${ENV}"
-. "\$PROJECT_DIR/config/common"
-
-REL="${UNIQUE_ID}_\${ENV^^}"
-DEST=\${BASE_DEST}/\${!REL}
-SRC=\${LOCAL_${UNIQUE_ID}_PATH}
-
-# Execute the sync.
-function run_rsync() {
-    rsync "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST > \${LOG}
-}
-
-echo "You're about to run this command:"
-echo "rsync \${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
-echo "\n"
-read -p "Continue with rsync(y/n)?" choice
-case "\$choice" in
-  y|Y ) run_rsync;;
-  n|N ) exit;;
-  * ) echo "invalid";;
-esac
-EOF
-
 mkdir -p ${PROJECT_ROOT}/scripts
-# See http://unix.stackexchange.com/a/19708
-sh -c "printf '%s' '$CONTENT' > ${PROJECT_ROOT}/scripts/${NEW_FILENAME}"
+
+# Output to file
+# cat <<- EOF > ${PROJECT_ROOT}/scripts/${NEW_FILENAME}
+read -r -d '' CONTENT <<- EOF
+	#!/bin/bash
+	# Project specific common variables: ${ENV}
+	# ${COMMENT}
+	# DO NOT COMMIT
+	# ------------------------------------------------------------------------------
+	if [ -z "\$1" ]
+	then
+	    echo "You must specify an environment."; exit
+	else
+	    ENV=\$1
+	fi
+
+	# Set directory and include dependencies for the specified environment.
+	THIS=\$(readlink -f \${BASH_SOURCE[0]})
+	SYNC_DIR=\$(dirname \$THIS)
+	PROJECT_DIR=\$(dirname \$SYNC_DIR)
+	. "\$PROJECT_DIR/config/\${ENV}/variables-\${ENV}"
+	. "\$PROJECT_DIR/config/common"
+
+	REL="${UNIQUE_ID}_\${ENV^^}"
+	DEST=\${BASE_DEST}/\${!REL}
+	SRC=\${LOCAL_${UNIQUE_ID}_PATH}
+
+	# Execute the sync.
+	function run_rsync() {
+	    rsync "\${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST > \${LOG}
+	}
+
+	echo "You're about to run this command:"
+	echo "rsync \${OPT[@]}" -e "ssh -p \${PORT}" \$SRC/ \${USERNAME}@\${IP}:\$DEST
+	echo "\n"
+	read -p "Continue with rsync(y/n)?" choice
+	case "\$choice" in
+	  y|Y ) run_rsync;;
+	  n|N ) exit;;
+	  * ) echo "invalid";;
+	esac
+EOF
+printf "%s" "$CONTENT" > ${PROJECT_ROOT}/scripts/${NEW_FILENAME}

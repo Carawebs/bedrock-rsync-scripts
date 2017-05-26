@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SURNAME=Egan
+FIRSTNAME=David
+read -r -d '' CONTENT <<- EOF
+#!/bin/bash
+# This is a comment
+	Firstname: \${FIRSTNAME}
+	Lastname: \${SURNAME}
+	Firstname: ${FIRSTNAME}
+	Lastname: ${SURNAME}
+EOF
+printf "%s" "$CONTENT" > tmp
